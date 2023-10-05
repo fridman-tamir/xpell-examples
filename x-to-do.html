@@ -1,0 +1,335 @@
+<!--
+    "x-to-do" Project:
+
+    1. create single web page for to do list using xpell
+    2. create a list of to do items
+    3. create a form to add new to do item
+    4. allow to edit and delete to do item
+    5. allow to mark to do item as done
+
+    Good Luck!
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Xpell To Do List</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        html,body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+        }
+
+        #app {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .main-view {
+            width: 100%;
+            height: 100%;
+            background-color: white;
+        }
+
+        .main-navbar {
+            width: 100%;
+            height: 50px;
+            background-color:white;
+            border-bottom: 1px solid black;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        .main-navbar-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 10px;
+        }
+        .main-navbar-time {
+            font-size: 15px;
+            font-weight: bold;
+            margin: 10px;
+        }
+
+        .main-content {
+            width: 100%;
+            height: calc(100% - 50px);
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content:space-around;
+            align-items: center;
+        }
+
+        .to-do-list {
+            width: 80%;
+            height: 80%;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            border: 1px solid black;
+            border-radius: 5px;
+        }
+
+        .to-do-list-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 10px;
+        }
+
+        .to-do-list-items {
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-y: scroll;
+        }
+
+        .to-do-list-item {
+            width: 100%;
+            height: 100px;
+            background-color: white;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            border-bottom: 1px solid black;
+        }
+
+        .to-do-list-item-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 10px;
+        }
+
+        .to-do-list-item-description {
+            font-size: 15px;
+            font-weight: bold;
+            margin: 10px;
+        }
+
+        /* .to-do-list-item-done {
+            font-size: 15px;
+            font-weight: bold;
+            margin: 10px;
+        } */
+
+        .to-do-list-item-edit {
+            font-size: 15px;
+            font-weight: bold;
+            margin: 10px;
+        }
+
+        .to-do-list-item-delete {
+            font-size: 15px;
+            font-weight: bold;
+            margin: 10px;
+        }
+
+        .to-do-list-add {
+            width: 100%;
+            height: 50px;
+            background-color: white;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            border-top: 1px solid black;
+        }
+
+
+    </style>
+
+    <script src="https://cdn.aimeverse.com/u/xpell.js" type="module"></script>
+    <script type="module" defer>
+        import { Xpell,XUI,XDB } from 'https://cdn.aimeverse.com/u/xpell.js';
+        Xpell.verbose() //allow xpell logger to print in console
+        Xpell.info() //get info about xpell engine
+        Xpell.start() //start xpell fps engine
+        Xpell.loadModule(XUI) //load xpell ui module
+
+        //xpell objects attributes are defined with "_" prefix, if not defined, it will be ignored
+
+
+        //data structure for to do list
+
+
+        const toDoList = XDB.getObject("x-to-do-list") || [
+            {
+                id:1,
+                title:"New Item",
+                description:"Item Description",
+                done:false
+            }
+        ]
+
+        console.log(toDoList);
+     
+        //main navbar
+        const mainNavbar ={
+            _type:"view",
+            _id:"main-navbar",
+            class:"main-navbar",
+            _children:[
+                {
+                    _type:"label",
+                    _id:"main-navbar-title",
+                    _text:"x-to-do",
+                    class:"main-navbar-title"
+                },
+                //add time label with _on_frame 
+                {
+                    _type:"label",
+                    _id:"main-navbar-time",
+                    class:"main-navbar-time",
+                    _text:"00:00:00",
+                    _on_frame:(xobj,frame) => {
+                        xobj.setText(new Date().toLocaleTimeString())
+                    }
+                }
+            ]
+        }
+
+        //create main view (div)
+        const mainView = XUI.create({
+            _type:"view",
+            _id:"main-view",
+            class:"main-view",
+            _children:[
+                mainNavbar,
+                {
+                    _type:"view",
+                    _id:"main-content",
+                    class:"main-content",
+                    _children:[
+                        {
+                            _type:"view",
+                            _id:"to-do-list",
+                            class:"to-do-list",
+                            _children:[
+                                {
+                                    _type:"label",
+                                    _id:"to-do-list-title",
+                                    _text:"To Do List",
+                                    class:"to-do-list-title"
+                                },
+                                {
+                                    _type:"view",
+                                    _id:"to-do-list-items",
+                                    class:"to-do-list-items",
+                                    _children:[
+                                        //create to do list items
+                                        ...toDoList.map((item,index) => {
+                                            return {
+                                                _type:"view",
+                                                _id:`to-do-list-item-${index}`,
+                                                class:"to-do-list-item",
+                                                _children:[
+                                                    {
+                                                        _type:"label",
+                                                        _id:`to-do-list-item-title-${index}`,
+                                                        class:"to-do-list-item-title",
+                                                        _text:item.title
+                                                    },
+                                                    {
+                                                        _type:"label",
+                                                        _id:`to-do-list-item-description-${index}`,
+                                                        class:"to-do-list-item-description",
+                                                        _text:item.description
+                                                    },
+                                                    {
+                                                        _type:"input",
+                                                        type:"checkbox",
+                                                        _id:`to-do-list-item-done-${index}`,
+                                                        class:"to-do-list-item-done",
+                                                        checked:item.done,
+                                                        value:item.done,
+                                                        _item_id:item.id,
+                                                        _on_click:(xobj,e) => {
+                                                                //mark to do item as done
+                                                                console.log(xobj.dom.checked,xobj._item_id);
+                                                                //search in to do list
+                                                                const toDoItem = toDoList.find((item) => {
+                                                                    return item.id == xobj._item_id
+                                                                })
+                                                                //update to do item
+                                                                toDoItem.done = xobj.dom.checked
+                                                                saveToDoList()
+
+
+                                                            
+                                                        }
+                                                        // _on_click:(xobj) => {
+                                                        //     //mark to do item as done
+                                                        //     console.log(xobj.dom.checked);
+                                                        //     xobj.dom.checked = !xobj.dom.checked
+                                                            
+                                                        // }
+                                                    },
+                                                    {
+                                                        _type:"button",
+                                                        _id:`to-do-list-item-edit-${index}`,
+                                                        class:"to-do-list-item-edit",
+                                                        _text:"Edit",
+                                                       
+                                                    },
+                                                    {
+                                                        _type:"button",
+                                                        _id:`to-do-list-item-delete-${index}`,
+                                                        class:"to-do-list-item-delete",
+                                                        _text:"Delete",
+                                                        
+                                                    }
+                                                ]
+                                            }
+                                        })
+                                    ]
+                                },
+                                {
+                                    _type:"button",
+                                    _id:"to-do-list-add",
+                                    class:"to-do-list-add",
+                                    _text:"Add",
+                                    _on_click:(xobj) => {
+                                        //add new to do item
+                                        
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        })
+
+        mainView.mount("app")
+
+        
+        const saveToDoList = () => {
+            //save to do list to local storage
+            XDB.saveObject("x-to-do-list",toDoList)
+        }
+
+
+    </script>
+
+</head>
+<body>
+    <!-- xpell will be played on "app" div-->
+    <div id="app"></div>
+</body>
+</html>
