@@ -1,13 +1,7 @@
 <!--
-    "x-to-do" Project:
-
-    1. create single web page for to do list using xpell
-    2. create a list of to do items
-    3. create a form to add new to do item
-    4. allow to edit and delete to do item
-    5. allow to mark to do item as done
-
-    Good Luck!
+    "x-to-do" list is a simple to do list web app using xpell
+    it uses xpell ui module XUI to create the ui
+    it uses xpell database module XDB to save the to do list in device local storage
 -->
 
 <!DOCTYPE html>
@@ -128,17 +122,19 @@
             margin: 10px;
         } */
 
-        .to-do-list-item-edit {
+        .to-do-list-button {
             font-size: 15px;
-            font-weight: bold;
-            margin: 10px;
+            border: none;
+            background-color: white;
+            cursor:pointer;
         }
 
-        .to-do-list-item-delete {
-            font-size: 15px;
-            font-weight: bold;
-            margin: 10px;
+        .to-do-list-button:hover {
+            color: blue;
+            text-decoration: underline;
         }
+
+        
 
         .to-do-list-add {
             width: 100%;
@@ -151,6 +147,19 @@
             border-top: 1px solid black;
         }
 
+
+        .form-item-title {
+            width:20%;
+            font-size: 15px;
+            height: 50px;
+            border-radius: 5px;
+        }
+
+        .form-item-description {
+            font-size: 15px;
+            height: 50px;
+            border-radius: 5px;
+        }
 
     </style>
 
@@ -261,7 +270,6 @@
                                                         _item_id:item.id,
                                                         _on_click:(xobj,e) => {
                                                                 //mark to do item as done
-                                                                console.log(xobj.dom.checked,xobj._item_id);
                                                                 //search in to do list
                                                                 const toDoItem = toDoList.find((item) => {
                                                                     return item.id == xobj._item_id
@@ -270,27 +278,18 @@
                                                                 toDoItem.done = xobj.dom.checked
                                                                 saveToDoList()
 
-
-                                                            
                                                         }
-                                                        // _on_click:(xobj) => {
-                                                        //     //mark to do item as done
-                                                        //     console.log(xobj.dom.checked);
-                                                        //     xobj.dom.checked = !xobj.dom.checked
-                                                            
-                                                        // }
                                                     },
                                                     {
-                                                        _type:"button",
+                                                        _type:"link",
                                                         _id:`to-do-list-item-edit-${index}`,
-                                                        class:"to-do-list-item-edit",
+                                                        class:"to-do-list-button",
                                                         _text:"Edit",
-                                                       
                                                     },
                                                     {
-                                                        _type:"button",
+                                                        _type:"link",
                                                         _id:`to-do-list-item-delete-${index}`,
-                                                        class:"to-do-list-item-delete",
+                                                        class:"to-do-list-button",
                                                         _text:"Delete",
                                                         
                                                     }
